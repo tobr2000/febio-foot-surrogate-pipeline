@@ -101,8 +101,15 @@ adapted to local partitions, paths, modules, and virtual environments.
 
 ## Data availability
 
-The full processed datasets are hundreds of gigabytes and are not Git objects.
-See `data/README.md` for lineage sizes and the planned manifest/download model.
+Compact final-state, model-ready releases are deposited separately on Zenodo:
+
+- **V9:** [doi:10.5281/zenodo.21371916](https://doi.org/10.5281/zenodo.21371916)
+- **V10:** [doi:10.5281/zenodo.21372171](https://doi.org/10.5281/zenodo.21372171)
+
+Each record contains `.npz` samples, JSON metadata, and a SHA-256 manifest. The
+much larger per-timestep histories are intentionally excluded. The DOIs are
+reserved and will resolve after the Zenodo records are published. See
+`data/README.md` for dataset lineage and field-level documentation.
 
 ## Scope and limitations
 

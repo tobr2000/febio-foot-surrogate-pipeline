@@ -8,3 +8,18 @@ authors:
     email: tobr2000@gmail.com
 year: 2026
 license: MIT
+references:
+  - type: dataset
+    title: "OrthoSense FEBio V9 Final-State Model-Ready Dataset"
+    authors:
+      - family-names: Brandt
+        given-names: Tobias
+    doi: 10.5281/zenodo.21371916
+    year: 2026
+  - type: dataset
+    title: "OrthoSense FEBio V10 Final-State Model-Ready Dataset"
+    authors:
+      - family-names: Brandt
+        given-names: Tobias
+    doi: 10.5281/zenodo.21372171
+    year: 2026
