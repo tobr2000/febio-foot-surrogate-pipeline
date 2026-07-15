@@ -1,0 +1,293 @@
+data:
+  dataset_id:
+  shard_dir: shards
+  stats_path: training/foot_stats.json
+  val_fraction: 0.1
+  train_base_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  validation_base_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  include_all_unseen_base_ids_in_val: true
+  seed: 42
+  stats_max_samples: 96
+  train_max_samples:
+  val_max_samples:
+
+training:
+  model: gno
+  epochs: 1000
+  batch_size: 32
+  learning_rate: 0.0003
+  min_learning_rate: 0.000001
+  lr_scheduler: cosine
+  lr_plateau_factor: 0.5
+  lr_plateau_patience: 15
+  weight_decay: 0.000001
+  num_workers: 4
+  prefetch_factor: 4
+  persistent_workers: true
+  max_open_shards: 4
+  history_time_samples: 6
+  node_history_point_samples: 2048
+  element_history_point_samples: 2048
+  contact_history_point_samples: 512
+  val_history_time_samples: 6
+  val_node_history_point_samples: 2048
+  val_element_history_point_samples: 2048
+  val_contact_history_point_samples: 512
+  shard_aware_batches: true
+  balance_base_ids_in_batch: true
+  device: auto
+  checkpoint_dir: training/checkpoints
+  grad_clip: 1.0
+  val_every: 1
+  timing_log_every: 100
+  early_stopping_patience: 80
+  checkpoint_selection:
+    metric: pressure_mse
+    group: unseen_bases_10_11
+    weights:
+      pressure: 1.0
+      peak: 0.75
+      reaction: 0.5
+      center_of_pressure: 0.5
+
+robalrs:
+  enabled: true
+  enabled_models: [pinn]
+  ema: 0.98
+  warmup_steps: 150
+  min_weight: 0.05
+  max_weight: 6.0
+  min_weight_by_component:
+    pressure: 0.45
+    reaction: 0.2
+    peak: 0.2
+  max_weight_by_component:
+    nonnegative_pressure: 2.0
+    contact_complementarity: 0.8
+    contact_projection: 0.8
+    equilibrium: 0.8
+    constitutive: 0.8
+    vm_consistency: 0.8
+    history_contact_pressure: 0.8
+    history_element_aux: 0.8
+    history_node_aux: 0.8
+    history_vm_consistency: 0.8
+    element_aux: 0.8
+    node_displacement_aux: 0.8
+
+
+pinn_curriculum:
+  data_aux_start_epoch: 8
+  data_aux_ramp_epochs: 24
+  data_aux_max_multiplier: 0.25
+  physics_start_epoch: 60
+  physics_ramp_epochs: 100
+  physics_max_multiplier: 0.08
+  history_start_epoch: 48
+  history_ramp_epochs: 100
+  history_max_multiplier: 0.06
+  contact_start_epoch: 48
+  contact_ramp_epochs: 100
+  contact_max_multiplier: 0.05
+  data_aux_every_steps: 3
+  physics_every_steps: 10
+  history_every_steps: 10
+  contact_every_steps: 8
+
+model_overrides:
+  gno:
+    training:
+      weight_decay: 0.00004
+      early_stopping_patience: 18
+      ema_decay: 0.997
+      lr_scheduler: plateau
+      lr_plateau_patience: 4
+      checkpoint_selection:
+        metric: composite
+        group: unseen_bases_10_11
+        weights:
+          pressure: 1.0
+          peak: 1.0
+          reaction: 0.5
+          center_of_pressure: 0.5
+    model:
+      hidden_dim: 160
+      layers: 4
+      k_neighbors: 8
+      dropout: 0.12
+      input_noise_std: 0.006
+      param_dropout: 0.04
+      residual_max: 0.10
+    loss:
+      pressure_loss: smooth_l1
+      pressure_loss_beta: 0.35
+      topk_pressure_loss: smooth_l1
+      topk_pressure_loss_beta: 0.35
+      reaction_weight: 0.035
+      peak_weight: 0.08
+      nonnegative_pressure_weight: 0.03
+      topk_pressure_weight: 0.08
+      topk_pressure_fraction: 0.08
+      pressure_mean_weight: 0.08
+      pressure_std_weight: 0.08
+      pressure_max_weight: 0.04
+      center_of_pressure_weight: 0.08
+      reaction_head_weight: 0.0
+      peak_head_weight: 0.0
+      pressure_shape_anchor_weight: 0.0
+      pressure_residual_l2_weight: 0.008
+      residual_scale_l2_weight: 0.015
+      regional_reaction_weight: 0.0
+      regional_peak_weight: 0.0
+    robalrs:
+      enabled: true
+      enabled_models: [gno]
+      ema: 0.97
+      warmup_steps: 80
+      min_weight: 0.25
+      max_weight: 2.5
+      min_weight_by_component:
+        pressure: 0.85
+        reaction: 0.2
+        peak: 0.2
+        center_of_pressure: 0.2
+        pressure_mean: 0.1
+        pressure_std: 0.1
+        topk_pressure: 0.1
+      max_weight_by_component:
+        nonnegative_pressure: 1.2
+        pressure_residual_l2: 0.5
+        residual_scale_l2: 0.5
+        pressure_max: 1.0
+  ffn:
+    training:
+      learning_rate: 0.0001
+      lr_scheduler: plateau
+      lr_plateau_patience: 8
+      weight_decay: 0.00005
+      early_stopping_patience: 40
+    model:
+      hidden_dim: 192
+      layers: 5
+      dropout: 0.15
+    loss:
+      reaction_weight: 0.0
+      peak_weight: 0.0
+      nonnegative_pressure_weight: 0.05
+  pinn:
+    training:
+      learning_rate: 0.00004
+      lr_scheduler: plateau
+      lr_plateau_patience: 4
+      weight_decay: 0.00002
+      early_stopping_patience: 24
+      ema_decay: 0.997
+      checkpoint_selection:
+        metric: composite
+        group: unseen_bases_10_11
+        weights:
+          pressure: 1.0
+          peak: 0.75
+          reaction: 0.5
+          center_of_pressure: 0.5
+    model:
+      hidden_dim: 192
+      layers: 6
+      dropout: 0.03
+    loss:
+      pressure_loss: smooth_l1
+      pressure_loss_beta: 0.35
+      pressure_weight: 1.15
+      reaction_weight: 0.03
+      peak_weight: 0.06
+      nonnegative_pressure_weight: 0.02
+      pressure_mean_weight: 0.04
+      pressure_std_weight: 0.04
+      pressure_max_weight: 0.02
+      center_of_pressure_weight: 0.06
+      pinn_contact_complementarity_weight: 0.0015
+      pinn_contact_projection_weight: 0.004
+      pinn_equilibrium_weight: 0.0008
+      pinn_constitutive_weight: 0.0015
+      pinn_vm_consistency_weight: 0.003
+      pinn_history_element_aux_weight: 0.004
+      pinn_history_node_aux_weight: 0.002
+      pinn_history_vm_consistency_weight: 0.0015
+      pinn_history_contact_weight: 0.012
+      reaction_head_weight: 0.0
+      peak_head_weight: 0.0
+      pressure_shape_anchor_weight: 0.0
+      pressure_residual_l2_weight: 0.0
+      regional_reaction_weight: 0.0
+      regional_peak_weight: 0.0
+    robalrs:
+      enabled: true
+      enabled_models: [pinn]
+      ema: 0.97
+      warmup_steps: 100
+      min_weight: 0.04
+      max_weight: 3.0
+      min_weight_by_component:
+        pressure: 0.9
+        center_of_pressure: 0.15
+        pressure_mean: 0.08
+        pressure_std: 0.08
+      max_weight_by_component:
+        nonnegative_pressure: 1.5
+        contact_complementarity: 0.35
+        contact_projection: 0.45
+        equilibrium: 0.45
+        constitutive: 0.45
+        vm_consistency: 0.45
+        history_contact_pressure: 0.6
+        history_element_aux: 0.45
+        history_node_aux: 0.45
+        history_vm_consistency: 0.45
+        element_aux: 0.45
+        node_displacement_aux: 0.45
+
+wandb:
+  enabled: true
+  project: vt2-febio-foot
+  entity:
+  mode: online
+  group: contact-pressure
+  log_code_artifacts: true
+  tags:
+    - febio
+    - foot
+    - contact-pressure
+  log_artifacts: true
+
+loss:
+  pressure_loss: mse
+  pressure_loss_beta: 0.5
+  topk_pressure_loss: mse
+  topk_pressure_loss_beta: 0.5
+  pressure_weight: 1.0
+  reaction_weight: 0.05
+  peak_weight: 0.1
+  nonnegative_pressure_weight: 0.02
+  element_aux_weight: 0.15
+  node_aux_weight: 0.05
+  pinn_equilibrium_weight: 0.01
+  pinn_constitutive_weight: 0.02
+  pinn_vm_consistency_weight: 0.05
+  pinn_contact_projection_weight: 0.05
+  pinn_contact_complementarity_weight: 0.02
+  pinn_history_element_aux_weight: 0.075
+  pinn_history_node_aux_weight: 0.025
+  pinn_history_vm_consistency_weight: 0.025
+  pinn_history_contact_weight: 0.25
+  reaction_head_weight: 0.0
+  peak_head_weight: 0.0
+  pressure_shape_anchor_weight: 0.0
+  pressure_residual_l2_weight: 0.0
+  regional_reaction_weight: 0.0
+  regional_peak_weight: 0.0
+
+model:
+  hidden_dim: 192
+  layers: 5
+  k_neighbors: 10
+  dropout: 0.05

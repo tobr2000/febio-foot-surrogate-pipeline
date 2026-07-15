@@ -1,0 +1,10 @@
+run_id,dataset_label,method,selection_metric,selection_mode,step,epoch,runtime_seconds,selection_value
+ccckxbl1,Simplified foot,FFN,val/pooled/pressure/nrmse,min,42,24,524.548912133,0.041184503585100174
+vc9i4yam,Simplified foot,GNO,val/pooled/pressure/nrmse,min,94,53,1197.182518349,0.025410866364836693
+5kvwpk4r,Simplified foot,PINN,val/pooled/pressure/nrmse,min,8,1,278.44097392,0.11892073601484299
+dp1yr25j,V10 model-ready,FFN,val/pooled/pressure/nrmse,min,74,70,1637.355785551,0.13624051213264465
+bbsqwzck,V10 model-ready,GNO,val/pooled/pressure/nrmse,min,58,11,1494.757417658,0.13573290407657623
+ljkknpce,V10 model-ready,PINN,val/pooled/pressure/nrmse,min,110,6,2662.553607636,0.13510572910308838
+5ei6h9ei,V9 model-ready,FFN,val/pooled/pressure/nrmse,min,187,19,416.915064957,0.10550922900438309
+1chrepk8,V9 model-ready,GNO,val/pooled/pressure/nrmse,min,47,15,498.282610076,0.10655678808689117
+l9tfvnyi,V9 model-ready,PINN,val/pooled/pressure/nrmse,min,128,13,4219.635012621,0.10774818062782288

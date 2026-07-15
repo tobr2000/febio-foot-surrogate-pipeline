@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the repository and the accompanying paper."
+title: "FEBio Foot Simulation-to-Surrogate Pipeline"
+type: software
+authors:
+  - family-names: Brandt
+    given-names: Tobias
+    email: tobr2000@gmail.com
+year: 2026
+license: MIT

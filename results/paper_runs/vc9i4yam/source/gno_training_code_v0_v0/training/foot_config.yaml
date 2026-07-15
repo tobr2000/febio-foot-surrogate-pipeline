@@ -1,0 +1,103 @@
+data:
+  shard_dir: shards
+  stats_path: training/foot_stats.json
+  val_fraction: 0.1
+  train_base_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  validation_base_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  include_all_unseen_base_ids_in_val: true
+  seed: 42
+  stats_max_samples: 15000
+  train_max_samples:
+  val_max_samples:
+
+training:
+  model: gno
+  epochs: 1000
+  batch_size: 32
+  learning_rate: 0.0003
+  min_learning_rate: 0.000001
+  lr_scheduler: cosine
+  lr_plateau_factor: 0.5
+  lr_plateau_patience: 15
+  weight_decay: 0.000001
+  num_workers: 4
+  prefetch_factor: 4
+  persistent_workers: true
+  max_open_shards: 4
+  shard_aware_batches: true
+  balance_base_ids_in_batch: true
+  device: auto
+  checkpoint_dir: training/checkpoints
+  grad_clip: 1.0
+  val_every: 1
+  timing_log_every: 100
+  early_stopping_patience: 80
+
+robalrs:
+  enabled: true
+  ema: 0.98
+  warmup_steps: 150
+  min_weight: 0.05
+  max_weight: 20.0
+
+pinn_curriculum:
+  data_aux_start_epoch: 4
+  data_aux_ramp_epochs: 12
+  physics_start_epoch: 16
+  physics_ramp_epochs: 32
+
+model_overrides:
+  ffn:
+    training:
+      learning_rate: 0.0001
+      lr_scheduler: plateau
+      lr_plateau_patience: 8
+      weight_decay: 0.00005
+      early_stopping_patience: 40
+    model:
+      dropout: 0.15
+    loss:
+      reaction_weight: 0.0
+      peak_weight: 0.0
+      nonnegative_pressure_weight: 0.05
+  pinn:
+    training:
+      learning_rate: 0.0001
+      lr_scheduler: plateau
+      lr_plateau_patience: 10
+      weight_decay: 0.00001
+      early_stopping_patience: 60
+    model:
+      dropout: 0.02
+
+wandb:
+  enabled: true
+  project: vt2-febio-foot
+  entity:
+  mode: online
+  group: contact-pressure
+  log_code_artifacts: true
+  tags:
+    - febio
+    - foot
+    - contact-pressure
+  log_artifacts: true
+
+loss:
+  pressure_weight: 1.0
+  reaction_weight: 0.05
+  peak_weight: 0.1
+  nonnegative_pressure_weight: 0.02
+  element_aux_weight: 0.15
+  node_aux_weight: 0.05
+  pinn_equilibrium_weight: 0.01
+  pinn_constitutive_weight: 0.02
+  pinn_vm_consistency_weight: 0.05
+  pinn_contact_projection_weight: 0.05
+  pinn_contact_complementarity_weight: 0.02
+
+model:
+  hidden_dim: 128
+  layers: 4
+  k_neighbors: 8
+  dropout: 0.05
