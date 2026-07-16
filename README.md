@@ -9,6 +9,23 @@ data engineering, and scientific machine learning.
 This is one half of the OrthoSense paper companion. The linked SFEM study is
 available in [`tobr2000/sfem-surrogate-modeling`](https://github.com/tobr2000/sfem-surrogate-modeling).
 
+## At a glance
+
+| | |
+|---|---|
+| **Problem** | Turn parameterized finite-element foot models into validated datasets and fast ML surrogates. |
+| **My contribution** | Built the simulation automation, manifest-driven dataset pipeline, QA tooling, training workflows, and comparative FFN/GNO/PINN evaluation. |
+| **Scale** | Twelve simplified-foot morphology families plus two later anatomical/contact model lineages. |
+| **Methods** | FEBio, Python, Slurm, FFN, graph neural operators, physics-informed training, and W&B-based experiment selection. |
+| **Evidence** | Versioned manifests, nine selected-run bundles, benchmark tables, dataset-quality checks, and paper-facing figures. |
+
+The simplified-foot comparison selected a GNO validation pressure NRMSE of
+`0.0254`, compared with `0.0412` for the FFN and `0.1189` for the PINN. On the
+more difficult V9 and V10 anatomical lineages, selected validation NRMSE values
+clustered around `0.105` and `0.135`, making the generalization gap visible
+rather than hiding it. Full values and selection criteria are recorded in
+[`results/tables/selected_runs.csv`](results/tables/selected_runs.csv).
+
 ![Dataset lineage](results/figures/fig00_dataset_lineage.png)
 
 | Simplified foot | Anatomical V9 | Anatomical V10 |
@@ -85,6 +102,21 @@ python scripts/run_batch.py \
 
 The selection metric is validation pooled contact-pressure NRMSE. Exact steps,
 epochs, runtimes, and values are recorded in `results/tables/selected_runs.csv`.
+
+![Selected surrogate benchmark](results/figures/fig03_final_benchmark.png)
+
+## Contribution and provenance
+
+The original FEBio geometries and third-party software are not presented as my
+work. My contribution is the engineering layer around them: parameterized model
+generation, deterministic sampling, batch execution, extraction, validation,
+dataset packaging, surrogate-model training, experiment tracking, and
+cross-lineage evaluation.
+
+The repository separates code from large datasets and records the lineage of
+the public model-ready releases. See [`data/README.md`](data/README.md) and
+[`CITATION.cff`](CITATION.cff) for availability, attribution, and citation
+details.
 
 ## Quick start
 
